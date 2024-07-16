@@ -1,15 +1,18 @@
 import { getApps, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import {
+  equalTo,
   get,
   getDatabase,
   onValue,
+  orderByChild,
   push,
+  query,
   ref,
   set,
   update,
 } from "firebase/database";
-import { AddUserProps } from "./types";
+import { AddUserProps, SelectedUser } from "./types";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -149,6 +152,29 @@ export const getUserByUid = async (uid: string) => {
     }
   } catch (error) {
     console.error("Error fetching user data: ", error);
+    throw error;
+  }
+};
+
+export const getOnlineUsers = async () => {
+  const usersRef = ref(database, "users/");
+  const onlineQuery = query(usersRef, orderByChild("online"), equalTo(true));
+
+  try {
+    const snapshot = await get(onlineQuery);
+    if (snapshot.exists()) {
+      const onlineUsers: SelectedUser[] = [];
+      snapshot.forEach((childSnapshot) => {
+        onlineUsers.push({ id: childSnapshot.key, ...childSnapshot.val() });
+      });
+      console.log(`onlineUsers: ${onlineUsers}`);
+      return onlineUsers;
+    } else {
+      console.log("No online users found.");
+      return [];
+    }
+  } catch (error) {
+    console.error("Error fetching online users: ", error);
     throw error;
   }
 };
