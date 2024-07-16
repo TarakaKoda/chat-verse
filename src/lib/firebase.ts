@@ -39,18 +39,23 @@ export const onLogin = async (userId: string) => {
 };
 
 export const fetchUsers = (callback: (users: any[]) => void) => {
-  const usersRef = ref(database, 'users/');
+  const usersRef = ref(database, "users/");
   onValue(usersRef, (snapshot) => {
     const data = snapshot.val();
-    const usersList = data ? Object.keys(data).map((key) => ({ id: key, ...data[key] })) : [];
+    const usersList = data
+      ? Object.keys(data).map((key) => ({ id: key, ...data[key] }))
+      : [];
     callback(usersList);
   });
 };
 
-
-export const sendMessage = (chatId: string, senderId: string, recipientId: string, messageText: string) => {
+export const sendMessage = (
+  chatId: string,
+  senderId: string,
+  recipientId: string,
+  messageText: string
+) => {
   const newMessageRef = push(ref(database, `messages/${chatId}`));
-  console.log(chatId, senderId, messageText, recipientId)
   set(newMessageRef, {
     senderId: senderId,
     recipientId: recipientId,
@@ -58,12 +63,10 @@ export const sendMessage = (chatId: string, senderId: string, recipientId: strin
     timestamp: Date.now(),
     status: "sent", // Initial status
   })
-  .then(() => {
-    console.log("Message sent successfully.");
-  })
-  .catch((error) => {
-    console.error("Error sending message: ", error);
-  });
+    .then(() => {
+      console.log("Message sent successfully.");
+    })
+    .catch((error) => {
+      console.error("Error sending message: ", error);
+    });
 };
-
-

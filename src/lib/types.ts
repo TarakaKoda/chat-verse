@@ -1,3 +1,4 @@
+import { User } from "firebase/auth";
 import { z } from "zod";
 
 export const SignUpFormSchema = z.object({
@@ -14,4 +15,18 @@ export const SignInFormSchema = z.object({
 export interface AddUserProps {
   userId: string;
   username: string;
+}
+
+export interface ChatStore {
+  users: User[];
+  currentUser: User | null;
+  selectedUser: User | null;
+  chats: any[];
+  setUsers: (users: User[]) => void;
+  setCurrentUser: (user: User | null) => void;
+  setSelectedUser: (user: User) => void;
+  setChats: (chats: any[]) => void;
+  fetchUsers: () => void;
+  fetchChats: (userId: string) => void;
+  initializeAuth: () => () => void;
 }

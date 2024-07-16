@@ -1,20 +1,40 @@
 "use client";
 
-import { sendMessage } from "@/lib/firebase";
 import React, { useState } from "react";
 import Chat from "./Chat";
-import { useUserChat } from "@/hooks/useUserChat";
+import useChatStore from "@/store/chatStore";
+import { sendMessage } from "@/lib/firebase";
+import { Console } from "console";
 
 const ChatPage = () => {
-  const { handleUserClick, chats, selectedUser, currentUser, users } =
-    useUserChat();
+  const { users, selectedUser, currentUser, handleUserClick, chats } =
+    useChatStore((state) => ({
+      users: state.users,
+      selectedUser: state.selectedUser,
+      currentUser: state.currentUser,
+      handleUserClick: state.setSelectedUser,
+      chats: state.chats,
+    }));
+
   const [messageText, setMessageText] = useState("");
+
+  if (!currentUser || !selectedUser) {
+    return <div>Please select a user to chat with.</div>;
+  }
+
   const currentUserId = currentUser.uid;
-  const selectedUserId = selectedUser.uid;
+  const selectedUserId = selectedUser.id;
+
+  console.log(`CurrentUserId: ${currentUserId} selectedUserID: ${selectedUserId}`)
+
   const chatId =
     currentUserId < selectedUserId
       ? `${currentUserId}_${selectedUserId}`
       : `${selectedUserId}_${currentUserId}`;
+
+  console.log(chatId)
+
+  // console.log(chatId);
 
   const handleSendMessage = () => {
     if (messageText.trim() !== "") {
@@ -25,7 +45,7 @@ const ChatPage = () => {
 
   return (
     <div className="bg-zinc-800 rounded-lg w-full h-full flex flex-col justify-between">
-      <Chat chatId={chatId} currentUserId={currentUserId} />
+      <Chat />
       <div className="message-input-container flex justify-around gap-10 p-10">
         <input
           className="w-full text-black"
