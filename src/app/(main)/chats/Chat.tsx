@@ -2,8 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import { ref, onValue } from "firebase/database";
-import { database } from "@/lib/firebase";
+import { database, markMessagesAsSeen } from "@/lib/firebase";
 import useChatStore from "@/store/chatStore";
+import { IoMdCheckmark } from "react-icons/io";
+import { IoCheckmarkDone } from "react-icons/io5";
+import { IoCheckmarkDoneSharp } from "react-icons/io5";
 
 interface Message {
   id: string;
@@ -15,7 +18,7 @@ interface Message {
 }
 
 const Chat = () => {
-  const { selectedUser, currentUser, chats } = useChatStore((state) => ({
+  const { selectedUser, currentUser } = useChatStore((state) => ({
     selectedUser: state.selectedUser,
     currentUser: state.currentUser,
     chats: state.chats,
@@ -26,7 +29,12 @@ const Chat = () => {
   useEffect(() => {
     if (!selectedUser || !currentUser) return;
 
-    const chatId = [currentUser.uid, selectedUser.uid].sort().join("-");
+    console.log(
+      `knnsiujcnsjbvsdjv  ${currentUser.uid} zffsdvsvsv:    ${selectedUser.id}   `
+    );
+
+    const chatId = [currentUser.uid, selectedUser.id].sort().join("_");
+    console.log(chatId);
     const messagesRef = ref(database, `messages/${chatId}`);
     onValue(messagesRef, (snapshot) => {
       const data = snapshot.val();
@@ -37,18 +45,50 @@ const Chat = () => {
     });
   }, [selectedUser, currentUser]);
 
+  useEffect(() => {
+    if (!selectedUser || !currentUser) return;
+
+    const chatId = [currentUser.uid, selectedUser.id].sort().join("_");
+
+    // Mark messages as seen when the component mounts or selectedUser/currentUser changes
+    markMessagesAsSeen(chatId, currentUser.uid);
+
+    // Set an interval to periodically mark messages as seen
+    const intervalId = setInterval(() => {
+      markMessagesAsSeen(chatId, currentUser.uid);
+    }, 5000); // Check every 5 seconds (adjust as needed)
+
+    return () => clearInterval(intervalId); // Clear interval on cleanup
+  }, [selectedUser, currentUser]);
+
   return (
-    <div className="chat-container">
-      <ul className="messages-list">
+    <div className=" custom-scrollbar max-h-[37rem] overflow-y-scroll">
+      <ul className="flex flex-col p-5 gap-5">
         {messages.map((message) => (
           <li
             key={message.id}
-            className={`message ${
-              message.senderId === currentUser?.uid ? "sent" : "received"
+            className={`bg-zinc-800 rounded-lg p-5 ${
+              message.senderId === currentUser?.uid
+                ? "text-green-500 self-end"
+                : "text-red-500 self-start"
             }`}>
-            <span>{message.text}</span>
-            <small>{new Date(message.timestamp).toLocaleTimeString()}</small>
-            <small>{message.status}</small>
+            <p>{message.text}</p>
+            <p className="flex justify-between">
+              <small className="text-xsm">
+                {new Date(message.timestamp).toLocaleTimeString()}
+              </small>
+              {message.senderId === currentUser?.uid && (
+                <>
+                  {message.status === "sent" ? (
+                    <IoMdCheckmark className="text-gray-500" />
+                  ) : message.status === "delivered" ? (
+                    <IoCheckmarkDone className="text-gray-500" />
+                  ) : (
+                    <IoCheckmarkDoneSharp className="text-blue-500" />
+                  )}
+                </>
+              )}
+            </p>
           </li>
         ))}
       </ul>

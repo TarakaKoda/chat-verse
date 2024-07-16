@@ -1,6 +1,6 @@
 import { getApps, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getDatabase, onValue, push, ref, set } from "firebase/database";
+import { get, getDatabase, onValue, push, ref, set, update } from "firebase/database";
 import { AddUserProps } from "./types";
 
 const firebaseConfig = {
@@ -56,6 +56,7 @@ export const sendMessage = (
   messageText: string
 ) => {
   const newMessageRef = push(ref(database, `messages/${chatId}`));
+  const messageId = newMessageRef.key;
   set(newMessageRef, {
     senderId: senderId,
     recipientId: recipientId,
@@ -65,8 +66,52 @@ export const sendMessage = (
   })
     .then(() => {
       console.log("Message sent successfully.");
+      updateMessageStatus(chatId, messageId, "delivered");
     })
     .catch((error) => {
       console.error("Error sending message: ", error);
     });
+};
+
+// Function to update the message status
+const updateMessageStatus = (chatId: string, messageId: string | null, status: string) => {
+  if (messageId) {
+    const messageRef = ref(database, `messages/${chatId}/${messageId}`);
+    update(messageRef, {
+      status: status,
+    })
+      .then(() => {
+        console.log(`Message status updated to ${status}.`);
+      })
+      .catch((error) => {
+        console.error("Error updating message status: ", error);
+      });
+  } else {
+    console.error("Error: Invalid message ID");
+  }
+};
+
+export const markMessagesAsSeen = (chatId: string, recipientId: string) => {
+  const messagesRef = ref(database, `messages/${chatId}`);
+  
+  get(messagesRef).then((snapshot) => {
+    if (snapshot.exists()) {
+      snapshot.forEach((childSnapshot) => {
+        const message = childSnapshot.val();
+        if (message.recipientId === recipientId && message.status !== "seen") {
+          update(ref(database, `messages/${chatId}/${childSnapshot.key}`), {
+            status: "seen",
+          })
+          .then(() => {
+            console.log(`Message ${childSnapshot.key} marked as seen.`);
+          })
+          .catch((error) => {
+            console.error("Error updating message status: ", error);
+          });
+        }
+      });
+    }
+  }).catch((error) => {
+    console.error("Error retrieving messages: ", error);
+  });
 };

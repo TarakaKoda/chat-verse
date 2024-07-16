@@ -5,6 +5,8 @@ import Chat from "./Chat";
 import useChatStore from "@/store/chatStore";
 import { sendMessage } from "@/lib/firebase";
 import { Console } from "console";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/button";
 
 const ChatPage = () => {
   const { users, selectedUser, currentUser, handleUserClick, chats } =
@@ -25,14 +27,16 @@ const ChatPage = () => {
   const currentUserId = currentUser.uid;
   const selectedUserId = selectedUser.id;
 
-  console.log(`CurrentUserId: ${currentUserId} selectedUserID: ${selectedUserId}`)
+  console.log(
+    `CurrentUserId: ${currentUserId} selectedUserID: ${selectedUserId}`
+  );
 
   const chatId =
     currentUserId < selectedUserId
       ? `${currentUserId}_${selectedUserId}`
       : `${selectedUserId}_${currentUserId}`;
 
-  console.log(chatId)
+  console.log(chatId);
 
   // console.log(chatId);
 
@@ -44,17 +48,19 @@ const ChatPage = () => {
   };
 
   return (
-    <div className="bg-zinc-800 rounded-lg w-full h-full flex flex-col justify-between">
+    <div className="bg-black rounded-lg w-full min-h-[43.5rem] max-h-[45.7rem] flex flex-col gap-3 justify-between">
       <Chat />
-      <div className="message-input-container flex justify-around gap-10 p-10">
-        <input
-          className="w-full text-black"
+      <div className="message-input-container flex justify-between w-full gap-10 p-5">
+        <Input
+          className="text-white w-[50rem] bg-zinc-800"
           type="text"
           value={messageText}
           onChange={(e) => setMessageText(e.target.value)}
           placeholder="Type your message..."
         />
-        <button onClick={handleSendMessage}>Send</button>
+        <Button className="bg-zinc-800" onClick={handleSendMessage}>
+          Send
+        </Button>
       </div>
     </div>
   );

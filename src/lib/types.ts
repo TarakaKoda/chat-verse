@@ -17,14 +17,20 @@ export interface AddUserProps {
   username: string;
 }
 
+export interface SelectedUser {
+  id: string;
+  username: string;
+  online: string;
+}
+
 export interface ChatStore {
-  users: User[];
+  users: SelectedUser[];
   currentUser: User | null;
-  selectedUser: User | null;
+  selectedUser: SelectedUser | null;
   chats: any[];
-  setUsers: (users: User[]) => void;
+  setUsers: (users: SelectedUser[]) => void;
   setCurrentUser: (user: User | null) => void;
-  setSelectedUser: (user: User) => void;
+  setSelectedUser: (user: SelectedUser) => void;
   setChats: (chats: any[]) => void;
   fetchUsers: () => void;
   fetchChats: (userId: string) => void;

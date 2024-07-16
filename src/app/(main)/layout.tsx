@@ -9,12 +9,12 @@ type Props = {
 
 const layout = ({ children }: Props) => {
   return (
-    <main className="bg-neutral-950 max-h-screen overflow-hidden text-white">
+    <main className="bg-neutral-950 max-h-screen min-h-screen flex flex-col overflow-hidden text-white">
       <Navbar />
-      <div className="flex">
+      <div className="flex gap-5">
         <LeftSideBar />
-        <section className="flex min-h-screen flex-1 flex-col">
-          <div className="mx-auto w-full h-full max-w-5xl">{children}</div>
+        <section className="flex mb-5 max-w-[60rem] overflow-hidden flex-1 flex-col">
+          <div className="mx-auto w-full max-h-[43.5rem] max-w-5xl">{children}</div>
         </section>
         <RightSideBar />
       </div>
