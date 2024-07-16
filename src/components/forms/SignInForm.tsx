@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth, onLogin } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -41,6 +41,7 @@ export default function SignInForm() {
     signInWithEmailAndPassword(auth, values.email, values.password)
       .then((userCredential) => {
         const user = userCredential.user;
+        onLogin(user.uid)
         console.log(`User successfully sign in!`);
         // Todo: Toast welcome user
         router.push("/chats");

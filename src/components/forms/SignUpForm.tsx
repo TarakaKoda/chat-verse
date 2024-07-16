@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { addUser, auth } from "@/lib/firebase";
 import {
   Form,
   FormControl,
@@ -40,6 +40,9 @@ export default function SignUpForm() {
     setIsLoading(true);
     createUserWithEmailAndPassword(auth, values.email, values.password)
       .then((userCredential) => {
+        const userId = userCredential.user.uid;
+        const username = values.username
+        addUser({userId, username});
         console.log(`User successfully signed up!`);
         // Todo: Toast welcome user
         router.push("/sign-in");
