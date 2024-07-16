@@ -128,7 +128,7 @@ export default function SignInForm() {
       <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
       {error && <p className="text-red-500 text-sm">{error}</p>}
       <p className="text-sm  mt-2 text-center text-white">
-        Don't have an account?
+        Don&apos;t have an account?
         <Link
           href="/sign-up"
           className="text-small-semibold ml-1 text-blue-500">
