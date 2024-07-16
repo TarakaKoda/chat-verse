@@ -48,7 +48,7 @@ const ChatPage = () => {
   };
 
   return (
-    <div className="bg-black rounded-lg w-full min-h-[43.5rem] max-h-[45.7rem] flex flex-col gap-3 justify-between">
+    <div className="bg-black rounded-lg w-full min-h-[40.5rem] max-h-[40.5rem] flex flex-col gap-3 justify-between">
       <Chat />
       <div className="message-input-container flex justify-between w-full gap-10 p-5">
         <Input

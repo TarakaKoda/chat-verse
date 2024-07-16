@@ -1,6 +1,14 @@
 import { getApps, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { get, getDatabase, onValue, push, ref, set, update } from "firebase/database";
+import {
+  get,
+  getDatabase,
+  onValue,
+  push,
+  ref,
+  set,
+  update,
+} from "firebase/database";
 import { AddUserProps } from "./types";
 
 const firebaseConfig = {
@@ -36,6 +44,10 @@ export const addUser = ({ userId, username }: AddUserProps) => {
 export const onLogin = async (userId: string) => {
   // Set user as online
   set(ref(database, `users/${userId}/online`), true);
+};
+export const onLogout = async (userId: string) => {
+  // Set user as offline
+  set(ref(database, `users/${userId}/online`), false);
 };
 
 export const fetchUsers = (callback: (users: any[]) => void) => {
@@ -74,7 +86,11 @@ export const sendMessage = (
 };
 
 // Function to update the message status
-const updateMessageStatus = (chatId: string, messageId: string | null, status: string) => {
+const updateMessageStatus = (
+  chatId: string,
+  messageId: string | null,
+  status: string
+) => {
   if (messageId) {
     const messageRef = ref(database, `messages/${chatId}/${messageId}`);
     update(messageRef, {
@@ -93,25 +109,46 @@ const updateMessageStatus = (chatId: string, messageId: string | null, status: s
 
 export const markMessagesAsSeen = (chatId: string, recipientId: string) => {
   const messagesRef = ref(database, `messages/${chatId}`);
-  
-  get(messagesRef).then((snapshot) => {
+
+  get(messagesRef)
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        snapshot.forEach((childSnapshot) => {
+          const message = childSnapshot.val();
+          if (
+            message.recipientId === recipientId &&
+            message.status !== "seen"
+          ) {
+            update(ref(database, `messages/${chatId}/${childSnapshot.key}`), {
+              status: "seen",
+            })
+              .then(() => {
+                console.log(`Message ${childSnapshot.key} marked as seen.`);
+              })
+              .catch((error) => {
+                console.error("Error updating message status: ", error);
+              });
+          }
+        });
+      }
+    })
+    .catch((error) => {
+      console.error("Error retrieving messages: ", error);
+    });
+};
+
+export const getUserByUid = async (uid: string) => {
+  const userRef = ref(database, `users/${uid}`);
+  try {
+    const snapshot = await get(userRef);
     if (snapshot.exists()) {
-      snapshot.forEach((childSnapshot) => {
-        const message = childSnapshot.val();
-        if (message.recipientId === recipientId && message.status !== "seen") {
-          update(ref(database, `messages/${chatId}/${childSnapshot.key}`), {
-            status: "seen",
-          })
-          .then(() => {
-            console.log(`Message ${childSnapshot.key} marked as seen.`);
-          })
-          .catch((error) => {
-            console.error("Error updating message status: ", error);
-          });
-        }
-      });
+      return snapshot.val();
+    } else {
+      console.log(`No user found with UID: ${uid}`);
+      return null;
     }
-  }).catch((error) => {
-    console.error("Error retrieving messages: ", error);
-  });
+  } catch (error) {
+    console.error("Error fetching user data: ", error);
+    throw error;
+  }
 };
