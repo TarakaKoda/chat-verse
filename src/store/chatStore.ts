@@ -1,11 +1,10 @@
+import { auth, database } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { onValue, ref } from "firebase/database";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { onAuthStateChanged, User } from "firebase/auth";
-import { ref, onValue } from "firebase/database";
-import { auth, database } from "@/lib/firebase";
 
-
-import { ChatStore, SelectedUser } from "@/lib/types";
+import { ChatStore } from "@/lib/types";
 
 const useChatStore = create<ChatStore>()(
   devtools((set, get) => ({
@@ -16,7 +15,6 @@ const useChatStore = create<ChatStore>()(
     setUsers: (users) => set({ users }),
     setCurrentUser: (user) => set({ currentUser: user }),
     setSelectedUser: (user) => {
-      console.log("selected User", user);
       set({ selectedUser: user });
       get().fetchChats(user.id);
     },
@@ -31,7 +29,6 @@ const useChatStore = create<ChatStore>()(
           : [];
         const currentUser = get().currentUser;
         if (currentUser) {
-          console.log("hereelllllllllllllllllllllllll");
           set({
             users: usersList.filter((user) => user.id !== currentUser.uid),
           });
@@ -43,7 +40,6 @@ const useChatStore = create<ChatStore>()(
     initializeAuth: () => {
       const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
         set({ currentUser: user });
-        console.log("CurrentUser here|||", user);
         if (user) {
           get().fetchUsers();
         }
@@ -55,9 +51,7 @@ const useChatStore = create<ChatStore>()(
     },
 
     fetchChats: (userId) => {
-        console.log(userId)
       const currentUser = get().currentUser;
-      console.log(`ppppppppppppppppppppp ${currentUser}`);
       const messagesRef = ref(database, `messages/`);
 
       onValue(messagesRef, (snapshot) => {
@@ -79,7 +73,6 @@ const useChatStore = create<ChatStore>()(
         }
 
         set({ chats: chatsList });
-        console.log(`CurrentUser: ${currentUser} ChatList: ${chatsList}`);
       });
     },
   }))

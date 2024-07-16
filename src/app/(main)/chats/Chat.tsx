@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { ref, onValue } from "firebase/database";
 import { database, markMessagesAsSeen } from "@/lib/firebase";
 import useChatStore from "@/store/chatStore";
+import { onValue, ref } from "firebase/database";
+import { useEffect, useState } from "react";
 import { IoMdCheckmark } from "react-icons/io";
-import { IoCheckmarkDone } from "react-icons/io5";
-import { IoCheckmarkDoneSharp } from "react-icons/io5";
+import { IoCheckmarkDone, IoCheckmarkDoneSharp } from "react-icons/io5";
 
 interface Message {
   id: string;
@@ -29,12 +28,8 @@ const Chat = () => {
   useEffect(() => {
     if (!selectedUser || !currentUser) return;
 
-    console.log(
-      `knnsiujcnsjbvsdjv  ${currentUser.uid} zffsdvsvsv:    ${selectedUser.id}   `
-    );
-
     const chatId = [currentUser.uid, selectedUser.id].sort().join("_");
-    console.log(chatId);
+
     const messagesRef = ref(database, `messages/${chatId}`);
     onValue(messagesRef, (snapshot) => {
       const data = snapshot.val();

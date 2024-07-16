@@ -37,11 +37,10 @@ export default function SignInForm() {
 
   const onSubmit = (values: z.infer<typeof SignInFormSchema>) => {
     setIsLoading(true);
-    console.log(values);
     signInWithEmailAndPassword(auth, values.email, values.password)
       .then((userCredential) => {
         const user = userCredential.user;
-        onLogin(user.uid)
+        onLogin(user.uid);
         console.log(`User successfully sign in!`);
         // Todo: Toast welcome user
         router.push("/chats");

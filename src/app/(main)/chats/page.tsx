@@ -1,44 +1,37 @@
 "use client";
 
-import React, { useState } from "react";
-import Chat from "./Chat";
-import useChatStore from "@/store/chatStore";
-import { sendMessage } from "@/lib/firebase";
-import { Console } from "console";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/button";
+import { sendMessage } from "@/lib/firebase";
+import useChatStore from "@/store/chatStore";
+import { useState } from "react";
+import Chat from "./Chat";
+import { NoUser } from "./NoUser";
 
 const ChatPage = () => {
-  const { users, selectedUser, currentUser, handleUserClick, chats } =
-    useChatStore((state) => ({
+  const { selectedUser, currentUser, handleUserClick, chats } = useChatStore(
+    (state) => ({
       users: state.users,
       selectedUser: state.selectedUser,
       currentUser: state.currentUser,
       handleUserClick: state.setSelectedUser,
       chats: state.chats,
-    }));
+    })
+  );
 
   const [messageText, setMessageText] = useState("");
 
   if (!currentUser || !selectedUser) {
-    return <div>Please select a user to chat with.</div>;
+    return <NoUser />;
   }
 
   const currentUserId = currentUser.uid;
   const selectedUserId = selectedUser.id;
 
-  console.log(
-    `CurrentUserId: ${currentUserId} selectedUserID: ${selectedUserId}`
-  );
-
   const chatId =
     currentUserId < selectedUserId
       ? `${currentUserId}_${selectedUserId}`
       : `${selectedUserId}_${currentUserId}`;
-
-  console.log(chatId);
-
-  // console.log(chatId);
 
   const handleSendMessage = () => {
     if (messageText.trim() !== "") {

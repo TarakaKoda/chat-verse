@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
-import useChatStore from "@/store/chatStore";
 import { SelectedUser } from "@/lib/types";
+import useChatStore from "@/store/chatStore";
+import { useEffect } from "react";
 
 const LeftSideBar = () => {
   const { users, selectedUser, setSelectedUser, initializeAuth } = useChatStore(
@@ -20,7 +20,6 @@ const LeftSideBar = () => {
   }, [initializeAuth, selectedUser]);
 
   const handleUserClick = (user: SelectedUser) => {
-    console.log(`selectedUser ${user}`);
     setSelectedUser(user);
   };
 

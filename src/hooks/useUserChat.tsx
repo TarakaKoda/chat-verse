@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
-import { onAuthStateChanged, User } from "firebase/auth";
-import { ref, onValue } from "firebase/database";
 import { auth, database } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { onValue, ref } from "firebase/database";
+import { useEffect, useState } from "react";
 
 export const useUserChat = () => {
   const [users, setUsers] = useState<any[]>([]);
@@ -47,9 +47,7 @@ export const useUserChat = () => {
   };
 
   const handleUserClick = (user: any) => {
-    console.log(currentUser);
     setSelectedUser(user);
-    console.log(selectedUser);
     fetchChats(user.id);
   };
 

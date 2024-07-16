@@ -41,8 +41,8 @@ export default function SignUpForm() {
     createUserWithEmailAndPassword(auth, values.email, values.password)
       .then((userCredential) => {
         const userId = userCredential.user.uid;
-        const username = values.username
-        addUser({userId, username});
+        const username = values.username;
+        addUser({ userId, username });
         console.log(`User successfully signed up!`);
         // Todo: Toast welcome user
         router.push("/sign-in");
@@ -51,7 +51,6 @@ export default function SignUpForm() {
       .finally(() => {
         setIsLoading(false);
       });
-    console.log(values);
   };
 
   return (
