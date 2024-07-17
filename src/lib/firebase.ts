@@ -1,9 +1,10 @@
 import { getApps, initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, User } from "firebase/auth";
 import {
   equalTo,
   get,
   getDatabase,
+  onDisconnect,
   onValue,
   orderByChild,
   push,
@@ -68,7 +69,8 @@ export const sendMessage = (
   chatId: string,
   senderId: string,
   recipientId: string,
-  messageText: string
+  messageText: string,
+  selectedUser: SelectedUser
 ) => {
   const newMessageRef = push(ref(database, `messages/${chatId}`));
   const messageId = newMessageRef.key;
@@ -81,7 +83,9 @@ export const sendMessage = (
   })
     .then(() => {
       console.log("Message sent successfully.");
-      updateMessageStatus(chatId, messageId, "delivered");
+      if (selectedUser.online) {
+        updateMessageStatus(chatId, messageId, "delivered");
+      }
     })
     .catch((error) => {
       console.error("Error sending message: ", error);
@@ -176,5 +180,50 @@ export const getOnlineUsers = async () => {
   } catch (error) {
     console.error("Error fetching online users: ", error);
     throw error;
+  }
+};
+
+export const updateMessageStatusToDelivered = async (currentUserId: string) => {
+  try {
+    const messagesRef = ref(database, `messages`);
+    const snapshot = await get(messagesRef);
+    const messages = snapshot.val();
+
+    if (messages) {
+      Object.keys(messages).forEach((chatId) => {
+        Object.keys(messages[chatId]).forEach((messageId) => {
+          const message = messages[chatId][messageId];
+          if (
+            message.recipientId === currentUserId &&
+            message.status === "sent"
+          ) {
+            const messageRef = ref(database, `messages/${chatId}/${messageId}`);
+            update(messageRef, { status: "delivered" });
+          }
+        });
+      });
+    }
+  } catch (error) {
+    console.error("Error updating message status: ", error);
+  }
+};
+
+
+export const handleTabClose = (currentUser: User | null) => {
+  if (currentUser) {
+    const userRef = ref(database, `users/${currentUser.uid}`);
+    set(userRef, { online: false });
+  }
+};
+
+export const setupUserOnlineStatus = (currentUser: User | null) => {
+  if (currentUser) {
+    const userRef = ref(database, `users/${currentUser.uid}`);
+    
+    // Set online status to true
+    set(userRef, { online: true });
+
+    // Set up onDisconnect to set online status to false
+    onDisconnect(userRef).set({ online: false });
   }
 };

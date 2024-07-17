@@ -1,8 +1,19 @@
 "use client";
 import { BackgroundBeams } from "@/components/ui/background-beams";
-import React from "react";
+import { updateMessageStatusToDelivered } from "@/lib/firebase";
+import useChatStore from "@/store/chatStore";
+import { useEffect } from "react";
 
 export function NoUser() {
+  const { currentUser } = useChatStore((state) => ({
+    currentUser: state.currentUser,
+  }));
+  useEffect(() => {
+    if (!currentUser) return;
+    // Update status to delivered for received messages
+    updateMessageStatusToDelivered(currentUser.uid);
+  }, [currentUser]);
+
   return (
     <div className="h-[40rem] w-full rounded-md bg-neutral-950 relative flex flex-col items-center justify-center antialiased">
       <div className="max-w-2xl mx-auto p-4">

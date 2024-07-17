@@ -51,7 +51,7 @@ const Chat = () => {
     // Set an interval to periodically mark messages as seen
     const intervalId = setInterval(() => {
       markMessagesAsSeen(chatId, currentUser.uid);
-    }, 5000); // Check every 5 seconds (adjust as needed)
+    }, 1000); // Check every 5 seconds (adjust as needed)
 
     return () => clearInterval(intervalId); // Clear interval on cleanup
   }, [selectedUser, currentUser]);

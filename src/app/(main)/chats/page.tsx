@@ -21,6 +21,8 @@ const ChatPage = () => {
 
   const [messageText, setMessageText] = useState("");
 
+  
+
   if (!currentUser || !selectedUser) {
     return <NoUser />;
   }
@@ -35,7 +37,7 @@ const ChatPage = () => {
 
   const handleSendMessage = () => {
     if (messageText.trim() !== "") {
-      sendMessage(chatId, currentUserId, selectedUserId, messageText);
+      sendMessage(chatId, currentUserId, selectedUserId, messageText, selectedUser);
       setMessageText("");
     }
   };

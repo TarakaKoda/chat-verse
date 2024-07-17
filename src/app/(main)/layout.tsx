@@ -18,14 +18,16 @@ const layout = ({ children }: Props) => {
   return (
     <main className="bg-neutral-950 max-h-screen min-h-screen flex flex-col overflow-hidden text-white">
       <Navbar />
-      <div className="flex mt-20 gap-5">
+      <div className="flex justify-between items-start mt-20 gap-5">
         <LeftSideBar />
         <section className="flex mb-5 max-w-[60rem] overflow-hidden flex-1 flex-col">
           <div className="mx-auto w-full max-h-[40.5rem] max-w-5xl">
             {children}
           </div>
         </section>
-        <RightSideBar />
+        <div className="w-70 overflow-y-scroll custom-scrollbar">
+          <RightSideBar />
+        </div>
       </div>
     </main>
   );
